@@ -1,13 +1,15 @@
 import { Play, Calendar, Tag, FileText, Image, Video, Mic } from 'lucide-react';
 import { Memory } from '../types';
 import { motion } from 'framer-motion';
+import { extractYouTubeVideoId, isYouTubeUrl } from '../utils/storage';
 
 interface MemoryCardProps {
   memory: Memory;
   onPlay: (musicUrl: string) => void;
+  onClick: () => void;
 }
 
-const MemoryCard = ({ memory, onPlay }: MemoryCardProps) => {
+const MemoryCard = ({ memory, onPlay, onClick }: MemoryCardProps) => {
   const getMediaIcon = () => {
     switch (memory.mediaType) {
       case 'text':
@@ -31,12 +33,50 @@ const MemoryCard = ({ memory, onPlay }: MemoryCardProps) => {
     }).format(date);
   };
 
+  const renderVideoContent = () => {
+    if (memory.mediaType !== 'video' || !memory.mediaContent) return null;
+    
+    if (isYouTubeUrl(memory.mediaContent)) {
+      const videoId = extractYouTubeVideoId(memory.mediaContent);
+      if (videoId) {
+        return (
+          <div className="mb-4">
+            <div className="aspect-video rounded-lg overflow-hidden bg-neutral-100">
+              <iframe
+                src={`https://www.youtube.com/embed/${videoId}`}
+                title="YouTube video"
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        );
+      }
+    }
+    
+    return (
+      <div className="mb-4 p-3 bg-neutral-50 rounded-lg">
+        <div className="flex items-center space-x-2 text-sm text-neutral-700">
+          <Video className="w-4 h-4" />
+          <span>Video URL: {memory.mediaContent}</span>
+        </div>
+      </div>
+    );
+  };
+
+  const handlePlayClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onPlay(memory.musicUrl);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="memory-card p-6 hover:scale-[1.02]"
+      className="memory-card p-6 hover:scale-[1.02] cursor-pointer"
+      onClick={onClick}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
@@ -66,7 +106,7 @@ const MemoryCard = ({ memory, onPlay }: MemoryCardProps) => {
             </p>
           </div>
           <button
-            onClick={() => onPlay(memory.musicUrl)}
+            onClick={handlePlayClick}
             className="p-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors duration-200"
           >
             <Play className="w-4 h-4" />
@@ -74,8 +114,11 @@ const MemoryCard = ({ memory, onPlay }: MemoryCardProps) => {
         </div>
       </div>
 
+      {/* Video Content */}
+      {renderVideoContent()}
+
       {/* Media Content Preview */}
-      {memory.mediaContent && (
+      {memory.mediaContent && memory.mediaType !== 'video' && (
         <div className="mb-4 p-3 bg-neutral-50 rounded-lg">
           <div className="text-sm text-neutral-700">
             {memory.mediaType === 'text' ? (

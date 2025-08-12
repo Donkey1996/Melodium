@@ -65,3 +65,53 @@ All data persistence happens through `src/utils/storage.ts`:
 - **Modifying storage**: Update functions in `src/utils/storage.ts`
 - **UI changes**: Components use Tailwind classes; global styles in `src/index.css`
 - **Adding animations**: Use Framer Motion patterns already established in components
+
+## YouTube Integration
+
+The app now supports YouTube video URLs in memory cards:
+
+### Features
+- **YouTube URL Detection**: `isYouTubeUrl()` and `extractYouTubeVideoId()` utilities in `src/utils/storage.ts`
+- **Embedded Playback**: YouTube videos render as embedded iframes in memory cards
+- **URL Format Support**: Supports all common YouTube URL formats:
+  - `https://www.youtube.com/watch?v=VIDEO_ID`
+  - `https://youtu.be/VIDEO_ID`
+  - `https://www.youtube.com/embed/VIDEO_ID`
+
+### Implementation Details
+- When creating a memory with `mediaType: 'video'`, paste a YouTube URL in the media content field
+- `MemoryCard` component automatically detects YouTube URLs and renders iframe embeds
+- Non-YouTube video URLs display as plain text links
+- Videos use responsive `aspect-video` Tailwind class for proper 16:9 ratio
+
+## Deployment & Growth To-Do List
+
+### Production Deployment (Vercel)
+- [ ] Connect GitHub repository to Vercel account
+- [ ] Configure automatic deployments from master branch
+- [ ] Set up custom domain (optional)
+- [ ] Test production build functionality
+- [ ] Monitor deployment logs and performance
+
+### SEO & Technical Enhancements
+- [ ] Add meta tags and Open Graph tags for social sharing
+- [ ] Implement PWA features (service worker, app manifest)
+- [ ] Add Google Analytics or Plausible for usage tracking
+- [ ] Set up error tracking with Sentry
+- [ ] Optimize bundle size and loading performance
+
+### User Acquisition Strategies
+- [ ] Launch on Product Hunt for developer/music communities
+- [ ] Share on social media platforms (Twitter, Reddit r/webdev, r/music)
+- [ ] Post in music-focused Discord servers and Facebook groups
+- [ ] Write blog posts about music + memory psychology
+- [ ] Create technical content about the React/TypeScript stack used
+
+### Growth Features (Future)
+- [ ] Spotify/Apple Music API integration for richer music data
+- [ ] Memory sharing capabilities between users
+- [ ] Export memories as shareable playlists
+- [ ] Social features (following friends' memories)
+- [ ] Mobile app version (React Native or PWA)
+- [ ] Advanced search and filtering for memories
+- [ ] Backup/sync functionality beyond localStorage

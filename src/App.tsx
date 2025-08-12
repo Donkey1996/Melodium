@@ -5,12 +5,14 @@ import MemoryCard from './components/MemoryCard';
 import CreateMemoryForm from './components/CreateMemoryForm';
 import MusicPlayer from './components/MusicPlayer';
 import EmptyState from './components/EmptyState';
+import MemoryModal from './components/MemoryModal';
 import { Memory, MemoryFormData } from './types';
 import { loadMemories, addMemory } from './utils/storage';
 
 function App() {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<{
     musicUrl: string;
     title?: string;
@@ -37,10 +39,18 @@ function App() {
     setCurrentPlayer(null);
   };
 
-  const handleDeleteMemory = (id: string) => {
-    setMemories(prev => prev.filter(memory => memory.id !== id));
-    // Note: In a real app, you'd also call deleteMemory from storage utils
+  const handleMemoryClick = (memory: Memory) => {
+    setSelectedMemory(memory);
   };
+
+  const handleCloseModal = () => {
+    setSelectedMemory(null);
+  };
+
+  // const handleDeleteMemory = (id: string) => {
+  //   setMemories(prev => prev.filter(memory => memory.id !== id));
+  //   // Note: In a real app, you'd also call deleteMemory from storage utils
+  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
@@ -71,6 +81,7 @@ function App() {
                     memory.musicTitle, 
                     memory.musicArtist
                   )}
+                  onClick={() => handleMemoryClick(memory)}
                 />
               ))}
             </AnimatePresence>
@@ -86,6 +97,22 @@ function App() {
           <CreateMemoryForm
             onSubmit={handleCreateMemory}
             onCancel={() => setShowCreateForm(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Memory Modal */}
+      <AnimatePresence>
+        {selectedMemory && (
+          <MemoryModal
+            memory={selectedMemory}
+            isOpen={!!selectedMemory}
+            onClose={handleCloseModal}
+            onPlay={(musicUrl) => handlePlayMusic(
+              musicUrl,
+              selectedMemory.musicTitle,
+              selectedMemory.musicArtist
+            )}
           />
         )}
       </AnimatePresence>
