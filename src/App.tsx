@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
+import { Analytics } from '@vercel/analytics/react';
 import Header from './components/Header';
 import MemoryCard from './components/MemoryCard';
 import CreateMemoryForm from './components/CreateMemoryForm';
@@ -128,6 +129,9 @@ function App() {
           />
         )}
       </AnimatePresence>
+
+      {/* Vercel Analytics */}
+      <Analytics />
     </div>
   );
 }

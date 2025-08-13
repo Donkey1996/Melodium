@@ -10,10 +10,11 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "@vercel/analytics": "^1.5.0",
+    "framer-motion": "^10.16.4",
     "lucide-react": "^0.263.1",
-    "framer-motion": "^10.16.4"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",
@@ -30,7 +31,12 @@
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
   },
-  "keywords": ["music", "memories", "multimedia", "webapp"],
+  "keywords": [
+    "music",
+    "memories",
+    "multimedia",
+    "webapp"
+  ],
   "author": "Your Name",
   "license": "MIT"
 }
