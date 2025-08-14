@@ -1,4 +1,4 @@
-import { Play, X } from 'lucide-react';
+import { Play, X, Trash2 } from 'lucide-react';
 import { Memory } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EMOTION_DICTIONARY } from '../utils/emotions';
@@ -8,9 +8,10 @@ import { useState } from 'react';
 interface MemoryCardProps {
   memory: Memory;
   onClick: () => void;
+  onDelete: (id: string) => void;
 }
 
-const MemoryCard = ({ memory, onClick }: MemoryCardProps) => {
+const MemoryCard = ({ memory, onClick, onDelete }: MemoryCardProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const handlePlayClick = (e: React.MouseEvent) => {
@@ -23,6 +24,13 @@ const MemoryCard = ({ memory, onClick }: MemoryCardProps) => {
     setIsPlaying(false);
   };
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.confirm('Are you sure you want to delete this memory?')) {
+      onDelete(memory.id);
+    }
+  };
+
   const currentEmotion = EMOTION_DICTIONARY[memory.emotion];
   const backgroundClass = currentEmotion?.background || 'bg-gradient-to-br from-neutral-100 to-neutral-200';
   const videoId = extractYouTubeVideoId(memory.youtubeUrl);
@@ -33,7 +41,7 @@ const MemoryCard = ({ memory, onClick }: MemoryCardProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`${backgroundClass} rounded-2xl border border-white/50 shadow-lg p-6 hover:scale-[1.02] cursor-pointer transition-all duration-300 relative ${
+      className={`group ${backgroundClass} rounded-2xl border border-white/50 shadow-lg p-6 hover:scale-[1.02] cursor-pointer transition-all duration-300 relative ${
         isPlaying ? 'col-span-1 md:col-span-2 lg:col-span-2' : ''
       }`}
       onClick={isPlaying ? undefined : onClick}
@@ -45,9 +53,19 @@ const MemoryCard = ({ memory, onClick }: MemoryCardProps) => {
         </div>
       </div>
 
+      {/* Delete Button - Top Right */}
+      <div className="absolute top-4 right-4 z-10">
+        <button
+          onClick={handleDelete}
+          className="p-2 bg-red-500/80 hover:bg-red-600 text-white rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100 hover:opacity-100"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
+
       {/* Close Video Button */}
       {isPlaying && (
-        <div className="absolute top-4 right-4 z-10">
+        <div className="absolute top-4 right-16 z-10">
           <button
             onClick={handleCloseVideo}
             className="p-2 bg-black/20 hover:bg-black/40 text-white rounded-full transition-all duration-200"

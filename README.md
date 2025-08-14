@@ -1,16 +1,16 @@
-# Melodium 🎵
+# Melodium ♪
 
-A minimal, calming webapp that allows you to attach cherished memories to your favorite music. Create a personal soundtrack of your life's moments with text, images, videos, and audio recordings.
+A minimalist emotion-based memory tracker for YouTube music. Attach feelings to your favorite YouTube videos and create a visual emotional soundtrack of your life.
 
 ## ✨ Features
 
-- **Memory Creation**: Attach multimedia content (text, images, videos, audio) to music
-- **Music Integration**: Link to any music URL (Spotify, YouTube, Apple Music, etc.)
-- **Beautiful UI**: Modern, minimalist design with calming color palette
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
-- **Local Storage**: Your memories are saved locally in your browser
-- **Smooth Animations**: Elegant transitions and micro-interactions
-- **Music Player**: Built-in player for your linked music
+- **Emotion-Based Memories**: Choose from 8 emotions (joyful, excited, romantic, peaceful, etc.)
+- **YouTube Integration**: Paste any YouTube URL with automatic song/artist extraction
+- **Embedded Player**: Watch videos directly in expandable memory cards
+- **Emotion Sorting**: Cards automatically grouped by emotion type
+- **Memory Management**: Create, view, and delete memories with confirmation
+- **Gradient Backgrounds**: Emotion-based visual theming for each memory
+- **Responsive Design**: Beautiful on desktop and mobile
 
 ## 🎨 Design Philosophy
 
@@ -71,34 +71,23 @@ yarn build
 
 ### Creating a Memory
 
-1. Click the "Create New Memory" button
-2. Fill in the memory details:
-   - Title and description
-   - Music URL (any playable link)
-   - Track title and artist (optional)
-   - Choose media type (text, image, video, audio)
-   - Add tags for organization
-3. Click "Create Memory"
+1. Click "Create New Memory"
+2. Select your emotion (8 options available)
+3. Paste a YouTube URL
+4. Click "Create Memory" - song/artist auto-extracted
 
-### Playing Music
+### Interacting with Memories
 
-- Click the play button on any memory card
-- Use the built-in music player at the bottom of the screen
-- Control volume and playback
-- Open music in a new tab for external playback
+- **Play**: Click play button to watch embedded video
+- **Delete**: Hover card, click trash icon (with confirmation)
+- **View Details**: Click card to open modal with YouTube link
+- **Automatic Sorting**: Cards grouped by emotion type
 
-### Managing Memories
+### Memory Management
 
-- Memories are automatically saved to your browser's local storage
-- View all memories in a beautiful grid layout
-- Each memory displays its media type and creation date
-
-## 🎯 Supported Media Types
-
-- **Text**: Write your memories directly in the app
-- **Images**: Upload and attach photos
-- **Videos**: Link to video content
-- **Audio**: Record or upload audio clips
+- Local browser storage with automatic save
+- Emotion-based gradient backgrounds for visual organization
+- Responsive grid layout with smooth animations
 
 ## 🔧 Customization
 
@@ -118,15 +107,16 @@ The app uses a calming color palette defined in `tailwind.config.js`. You can cu
 ```
 src/
 ├── components/          # React components
-│   ├── Header.tsx      # App header
-│   ├── MemoryCard.tsx  # Individual memory display
-│   ├── CreateMemoryForm.tsx # Memory creation form
-│   ├── MusicPlayer.tsx # Music playback controls
+│   ├── MemoryCard.tsx  # Memory cards with embedded YouTube player
+│   ├── CreateMemoryForm.tsx # Emotion + YouTube URL form
+│   ├── MemoryModal.tsx # Detailed memory view
 │   └── EmptyState.tsx  # Empty state display
-├── types/              # TypeScript type definitions
 ├── utils/              # Utility functions
-├── App.tsx             # Main application component
-├── main.tsx            # Application entry point
+│   ├── emotions.ts     # Emotion dictionary & gradients
+│   ├── youtube.ts      # YouTube metadata extraction
+│   └── storage.ts      # Local storage management
+├── types/              # TypeScript definitions
+├── App.tsx             # Main application
 └── index.css           # Global styles
 ```
 
@@ -150,4 +140,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Melodium** - Where memories meet music 🎵✨
+**Melodium** - Your emotional YouTube memory tracker ♪

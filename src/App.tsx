@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Analytics } from '@vercel/analytics/react';
 import { Memory, MemoryFormData } from './types';
-import { loadMemories, addMemory } from './utils/storage';
+import { loadMemories, addMemory, deleteMemory } from './utils/storage';
 import EmptyState from './components/EmptyState';
 import CreateMemoryForm from './components/CreateMemoryForm';
 import MemoryCard from './components/MemoryCard';
@@ -42,6 +42,28 @@ function App() {
     setSelectedMemory(null);
   };
 
+  const handleDeleteMemory = (id: string) => {
+    deleteMemory(id);
+    setMemories(prev => prev.filter(memory => memory.id !== id));
+    // Close modal if the deleted memory was selected
+    if (selectedMemory?.id === id) {
+      setSelectedMemory(null);
+    }
+  };
+
+  // Sort memories by emotion for consistent grouping
+  const sortedMemories = [...memories].sort((a, b) => {
+    const emotionOrder = ['joyful', 'excited', 'energetic', 'romantic', 'peaceful', 'nostalgic', 'reflective', 'sad'];
+    const aIndex = emotionOrder.indexOf(a.emotion);
+    const bIndex = emotionOrder.indexOf(b.emotion);
+    
+    // If emotion not in order, put at end
+    const aOrder = aIndex === -1 ? emotionOrder.length : aIndex;
+    const bOrder = bIndex === -1 ? emotionOrder.length : bIndex;
+    
+    return aOrder - bOrder;
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
       <header className="bg-white/80 backdrop-blur-md border-b border-neutral-200">
@@ -70,11 +92,12 @@ function App() {
         {memories.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <AnimatePresence>
-              {memories.map((memory) => (
+              {sortedMemories.map((memory) => (
                 <MemoryCard
                   key={memory.id}
                   memory={memory}
                   onClick={() => handleMemoryClick(memory)}
+                  onDelete={handleDeleteMemory}
                 />
               ))}
             </AnimatePresence>
