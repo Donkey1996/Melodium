@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react';
-import { Plus, Music, FileText, Image, Video, Mic, X } from 'lucide-react';
+import { useState } from 'react';
+import { Plus, Music, Heart, X } from 'lucide-react';
 import { MemoryFormData } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { EMOTION_DICTIONARY, getEmotionKeys, getSubEmotions } from '../utils/emotions';
 
 interface CreateMemoryFormProps {
   onSubmit: (data: MemoryFormData) => void;
@@ -15,13 +16,12 @@ const CreateMemoryForm = ({ onSubmit, onCancel }: CreateMemoryFormProps) => {
     musicUrl: '',
     musicTitle: '',
     musicArtist: '',
-    mediaType: 'text',
-    mediaContent: '',
+    primaryEmotion: '',
+    subEmotions: [],
     tags: []
   });
 
   const [tagInput, setTagInput] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (field: keyof MemoryFormData, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -38,34 +38,24 @@ const CreateMemoryForm = ({ onSubmit, onCancel }: CreateMemoryFormProps) => {
     handleInputChange('tags', formData.tags.filter(tag => tag !== tagToRemove));
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // For now, we'll just store the file name as content
-      // In a real app, you'd upload to a server and store the URL
-      handleInputChange('mediaContent', file.name);
+  const handlePrimaryEmotionChange = (emotion: string) => {
+    handleInputChange('primaryEmotion', emotion);
+    handleInputChange('subEmotions', []);
+  };
+
+  const handleSubEmotionToggle = (subEmotion: string) => {
+    const currentSubEmotions = formData.subEmotions;
+    if (currentSubEmotions.includes(subEmotion)) {
+      handleInputChange('subEmotions', currentSubEmotions.filter(e => e !== subEmotion));
+    } else {
+      handleInputChange('subEmotions', [...currentSubEmotions, subEmotion]);
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.title && formData.musicUrl) {
+    if (formData.title && formData.musicUrl && formData.primaryEmotion) {
       onSubmit(formData);
-    }
-  };
-
-  const getMediaIcon = () => {
-    switch (formData.mediaType) {
-      case 'text':
-        return <FileText className="w-5 h-5" />;
-      case 'image':
-        return <Image className="w-5 h-5" />;
-      case 'video':
-        return <Video className="w-5 h-5" />;
-      case 'audio':
-        return <Mic className="w-5 h-5" />;
-      default:
-        return <FileText className="w-5 h-5" />;
     }
   };
 
@@ -170,62 +160,67 @@ const CreateMemoryForm = ({ onSubmit, onCancel }: CreateMemoryFormProps) => {
               </div>
             </div>
 
-            {/* Media Section */}
+            {/* Emotion Section */}
             <div className="bg-neutral-50 rounded-2xl p-6">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="p-2 bg-primary-100 rounded-xl">
-                  {getMediaIcon()}
+                  <Heart className="w-5 h-5 text-primary-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-neutral-900">Memory Media</h3>
+                <h3 className="text-lg font-semibold text-neutral-900">How does this memory make you feel?</h3>
               </div>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Media Type
+                  <label className="block text-sm font-medium text-neutral-700 mb-3">
+                    Primary Emotion
                   </label>
-                  <select
-                    value={formData.mediaType}
-                    onChange={(e) => handleInputChange('mediaType', e.target.value as any)}
-                    className="input-field"
-                  >
-                    <option value="text">Text</option>
-                    <option value="image">Image</option>
-                    <option value="video">Video</option>
-                    <option value="audio">Audio Recording</option>
-                  </select>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    {getEmotionKeys().map((emotionKey) => {
+                      const emotion = EMOTION_DICTIONARY[emotionKey];
+                      return (
+                        <button
+                          key={emotionKey}
+                          type="button"
+                          onClick={() => handlePrimaryEmotionChange(emotionKey)}
+                          className={`p-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                            formData.primaryEmotion === emotionKey
+                              ? 'bg-primary-500 text-white shadow-md'
+                              : 'bg-white text-neutral-700 hover:bg-primary-50 border border-neutral-200'
+                          }`}
+                        >
+                          {emotion.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                {formData.mediaType === 'text' ? (
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Text Content
+                {formData.primaryEmotion && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <label className="block text-sm font-medium text-neutral-700 mb-3">
+                      Related Emotions (optional)
                     </label>
-                    <textarea
-                      value={formData.mediaContent}
-                      onChange={(e) => handleInputChange('mediaContent', e.target.value)}
-                      className="input-field resize-none"
-                      rows={4}
-                      placeholder="Write your memory here..."
-                    />
-                  </div>
-                ) : (
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Upload {formData.mediaType.charAt(0).toUpperCase() + formData.mediaType.slice(1)}
-                    </label>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      onChange={handleFileUpload}
-                      accept={
-                        formData.mediaType === 'image' ? 'image/*' :
-                        formData.mediaType === 'video' ? 'video/*' :
-                        formData.mediaType === 'audio' ? 'audio/*' : '*'
-                      }
-                      className="input-field"
-                    />
-                  </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      {getSubEmotions(formData.primaryEmotion).map((subEmotion) => (
+                        <button
+                          key={subEmotion}
+                          type="button"
+                          onClick={() => handleSubEmotionToggle(subEmotion)}
+                          className={`p-2 rounded-lg text-xs transition-all duration-200 ${
+                            formData.subEmotions.includes(subEmotion)
+                              ? 'bg-primary-100 text-primary-700 border border-primary-200'
+                              : 'bg-white text-neutral-600 hover:bg-neutral-50 border border-neutral-200'
+                          }`}
+                        >
+                          {subEmotion}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
                 )}
               </div>
             </div>

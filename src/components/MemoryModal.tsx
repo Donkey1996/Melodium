@@ -1,7 +1,7 @@
-import { X, Play, Calendar, Tag, FileText, Image, Video, Mic, ExternalLink } from 'lucide-react';
+import { X, Play, Calendar, Tag, Heart, ExternalLink } from 'lucide-react';
 import { Memory } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { extractYouTubeVideoId, isYouTubeUrl } from '../utils/storage';
+import { EMOTION_DICTIONARY } from '../utils/emotions';
 
 interface MemoryModalProps {
   memory: Memory;
@@ -11,19 +11,18 @@ interface MemoryModalProps {
 }
 
 const MemoryModal = ({ memory, isOpen, onClose, onPlay }: MemoryModalProps) => {
-  const getMediaIcon = () => {
-    switch (memory.mediaType) {
-      case 'text':
-        return <FileText className="w-5 h-5" />;
-      case 'image':
-        return <Image className="w-5 h-5" />;
-      case 'video':
-        return <Video className="w-5 h-5" />;
-      case 'audio':
-        return <Mic className="w-5 h-5" />;
-      default:
-        return <FileText className="w-5 h-5" />;
-    }
+  const getEmotionColor = (emotion: string) => {
+    const colors: Record<string, string> = {
+      joyful: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+      sad: 'bg-blue-100 text-blue-700 border-blue-200',
+      nostalgic: 'bg-purple-100 text-purple-700 border-purple-200',
+      peaceful: 'bg-green-100 text-green-700 border-green-200',
+      energetic: 'bg-orange-100 text-orange-700 border-orange-200',
+      romantic: 'bg-pink-100 text-pink-700 border-pink-200',
+      reflective: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+      excited: 'bg-red-100 text-red-700 border-red-200'
+    };
+    return colors[emotion] || 'bg-neutral-100 text-neutral-700 border-neutral-200';
   };
 
   const formatDate = (date: Date) => {
@@ -37,108 +36,38 @@ const MemoryModal = ({ memory, isOpen, onClose, onPlay }: MemoryModalProps) => {
     }).format(date);
   };
 
-  const renderMediaContent = () => {
-    if (!memory.mediaContent) return null;
-
-    switch (memory.mediaType) {
-      case 'text':
-        return (
-          <div className="bg-neutral-50 rounded-xl p-6">
-            <h4 className="font-medium text-neutral-900 mb-3 flex items-center space-x-2">
-              <FileText className="w-4 h-4" />
-              <span>Memory Text</span>
-            </h4>
-            <p className="text-neutral-700 leading-relaxed whitespace-pre-wrap">
-              {memory.mediaContent}
-            </p>
+  const renderEmotions = () => {
+    return (
+      <div className="bg-neutral-50 rounded-xl p-6">
+        <h4 className="font-medium text-neutral-900 mb-4 flex items-center space-x-2">
+          <Heart className="w-5 h-5" />
+          <span>Emotions</span>
+        </h4>
+        <div className="space-y-3">
+          <div>
+            <p className="text-sm text-neutral-600 mb-2">Primary emotion:</p>
+            <span className={`inline-block px-4 py-2 text-sm font-medium rounded-full border ${getEmotionColor(memory.primaryEmotion)}`}>
+              {EMOTION_DICTIONARY[memory.primaryEmotion]?.label || memory.primaryEmotion}
+            </span>
           </div>
-        );
-
-      case 'video':
-        if (isYouTubeUrl(memory.mediaContent)) {
-          const videoId = extractYouTubeVideoId(memory.mediaContent);
-          if (videoId) {
-            return (
-              <div className="bg-neutral-50 rounded-xl p-6">
-                <h4 className="font-medium text-neutral-900 mb-3 flex items-center space-x-2">
-                  <Video className="w-4 h-4" />
-                  <span>Video</span>
-                </h4>
-                <div className="aspect-video rounded-lg overflow-hidden bg-neutral-100">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${videoId}`}
-                    title="YouTube video"
-                    className="w-full h-full border-0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
+          {memory.subEmotions.length > 0 && (
+            <div>
+              <p className="text-sm text-neutral-600 mb-2">Related emotions:</p>
+              <div className="flex flex-wrap gap-2">
+                {memory.subEmotions.map((subEmotion, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 text-xs bg-neutral-100 text-neutral-600 rounded-full border border-neutral-200"
+                  >
+                    {subEmotion}
+                  </span>
+                ))}
               </div>
-            );
-          }
-        }
-        return (
-          <div className="bg-neutral-50 rounded-xl p-6">
-            <h4 className="font-medium text-neutral-900 mb-3 flex items-center space-x-2">
-              <Video className="w-4 h-4" />
-              <span>Video Link</span>
-            </h4>
-            <a 
-              href={memory.mediaContent} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-primary-600 hover:text-primary-700 flex items-center space-x-2"
-            >
-              <span>{memory.mediaContent}</span>
-              <ExternalLink className="w-4 h-4" />
-            </a>
-          </div>
-        );
-
-      case 'audio':
-        return (
-          <div className="bg-neutral-50 rounded-xl p-6">
-            <h4 className="font-medium text-neutral-900 mb-3 flex items-center space-x-2">
-              <Mic className="w-4 h-4" />
-              <span>Audio</span>
-            </h4>
-            {memory.mediaContent.startsWith('http') ? (
-              <audio controls className="w-full">
-                <source src={memory.mediaContent} />
-                Your browser does not support the audio element.
-              </audio>
-            ) : (
-              <div className="text-neutral-600">
-                <p>Audio file: {memory.mediaContent}</p>
-              </div>
-            )}
-          </div>
-        );
-
-      case 'image':
-        return (
-          <div className="bg-neutral-50 rounded-xl p-6">
-            <h4 className="font-medium text-neutral-900 mb-3 flex items-center space-x-2">
-              <Image className="w-4 h-4" />
-              <span>Image</span>
-            </h4>
-            {memory.mediaContent.startsWith('http') ? (
-              <img 
-                src={memory.mediaContent} 
-                alt="Memory"
-                className="w-full rounded-lg"
-              />
-            ) : (
-              <div className="text-neutral-600">
-                <p>Image file: {memory.mediaContent}</p>
-              </div>
-            )}
-          </div>
-        );
-
-      default:
-        return null;
-    }
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -163,9 +92,9 @@ const MemoryModal = ({ memory, isOpen, onClose, onPlay }: MemoryModalProps) => {
             <div className="flex items-start justify-between p-6 border-b border-neutral-200">
               <div className="flex-1">
                 <div className="flex items-center space-x-3 mb-2">
-                  {getMediaIcon()}
-                  <span className="text-sm font-medium text-neutral-600 capitalize">
-                    {memory.mediaType}
+                  <Heart className="w-5 h-5" />
+                  <span className="text-sm font-medium text-neutral-600">
+                    {EMOTION_DICTIONARY[memory.primaryEmotion]?.label || memory.primaryEmotion}
                   </span>
                 </div>
                 <h2 className="text-2xl font-bold text-neutral-900 mb-2">
@@ -215,8 +144,8 @@ const MemoryModal = ({ memory, isOpen, onClose, onPlay }: MemoryModalProps) => {
                 </div>
               </div>
 
-              {/* Media Content */}
-              {renderMediaContent()}
+              {/* Emotions */}
+              {renderEmotions()}
 
               {/* Tags */}
               {memory.tags.length > 0 && (

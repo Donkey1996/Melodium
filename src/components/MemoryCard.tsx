@@ -1,7 +1,7 @@
-import { Play, Calendar, Tag, FileText, Image, Video, Mic } from 'lucide-react';
+import { Play, Calendar, Tag, Heart } from 'lucide-react';
 import { Memory } from '../types';
 import { motion } from 'framer-motion';
-import { extractYouTubeVideoId, isYouTubeUrl } from '../utils/storage';
+import { EMOTION_DICTIONARY } from '../utils/emotions';
 
 interface MemoryCardProps {
   memory: Memory;
@@ -10,21 +10,6 @@ interface MemoryCardProps {
 }
 
 const MemoryCard = ({ memory, onPlay, onClick }: MemoryCardProps) => {
-  const getMediaIcon = () => {
-    switch (memory.mediaType) {
-      case 'text':
-        return <FileText className="w-4 h-4" />;
-      case 'image':
-        return <Image className="w-4 h-4" />;
-      case 'video':
-        return <Video className="w-4 h-4" />;
-      case 'audio':
-        return <Mic className="w-4 h-4" />;
-      default:
-        return <FileText className="w-4 h-4" />;
-    }
-  };
-
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
       month: 'short',
@@ -33,36 +18,18 @@ const MemoryCard = ({ memory, onPlay, onClick }: MemoryCardProps) => {
     }).format(date);
   };
 
-  const renderVideoContent = () => {
-    if (memory.mediaType !== 'video' || !memory.mediaContent) return null;
-    
-    if (isYouTubeUrl(memory.mediaContent)) {
-      const videoId = extractYouTubeVideoId(memory.mediaContent);
-      if (videoId) {
-        return (
-          <div className="mb-4">
-            <div className="aspect-video rounded-lg overflow-hidden bg-neutral-100">
-              <iframe
-                src={`https://www.youtube.com/embed/${videoId}`}
-                title="YouTube video"
-                className="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-          </div>
-        );
-      }
-    }
-    
-    return (
-      <div className="mb-4 p-3 bg-neutral-50 rounded-lg">
-        <div className="flex items-center space-x-2 text-sm text-neutral-700">
-          <Video className="w-4 h-4" />
-          <span>Video URL: {memory.mediaContent}</span>
-        </div>
-      </div>
-    );
+  const getEmotionColor = (emotion: string) => {
+    const colors: Record<string, string> = {
+      joyful: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+      sad: 'bg-blue-100 text-blue-700 border-blue-200',
+      nostalgic: 'bg-purple-100 text-purple-700 border-purple-200',
+      peaceful: 'bg-green-100 text-green-700 border-green-200',
+      energetic: 'bg-orange-100 text-orange-700 border-orange-200',
+      romantic: 'bg-pink-100 text-pink-700 border-pink-200',
+      reflective: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+      excited: 'bg-red-100 text-red-700 border-red-200'
+    };
+    return colors[emotion] || 'bg-neutral-100 text-neutral-700 border-neutral-200';
   };
 
   const handlePlayClick = (e: React.MouseEvent) => {
@@ -89,8 +56,8 @@ const MemoryCard = ({ memory, onPlay, onClick }: MemoryCardProps) => {
         </div>
         
         <div className="flex items-center space-x-2 text-neutral-500">
-          {getMediaIcon()}
-          <span className="text-xs capitalize">{memory.mediaType}</span>
+          <Heart className="w-4 h-4" />
+          <span className="text-xs">{EMOTION_DICTIONARY[memory.primaryEmotion]?.label || memory.primaryEmotion}</span>
         </div>
       </div>
 
@@ -114,24 +81,26 @@ const MemoryCard = ({ memory, onPlay, onClick }: MemoryCardProps) => {
         </div>
       </div>
 
-      {/* Video Content */}
-      {renderVideoContent()}
-
-      {/* Media Content Preview */}
-      {memory.mediaContent && memory.mediaType !== 'video' && (
-        <div className="mb-4 p-3 bg-neutral-50 rounded-lg">
-          <div className="text-sm text-neutral-700">
-            {memory.mediaType === 'text' ? (
-              <p className="line-clamp-3">{memory.mediaContent}</p>
-            ) : (
-              <div className="flex items-center space-x-2">
-                {getMediaIcon()}
-                <span>Media attached</span>
-              </div>
-            )}
-          </div>
+      {/* Emotions Display */}
+      <div className="mb-4">
+        <div className="flex items-center space-x-2 mb-2">
+          <Heart className="w-4 h-4 text-neutral-600" />
+          <span className="text-sm font-medium text-neutral-700">Emotions</span>
         </div>
-      )}
+        <div className="flex flex-wrap gap-2">
+          <span className={`px-3 py-1 text-sm font-medium rounded-full border ${getEmotionColor(memory.primaryEmotion)}`}>
+            {EMOTION_DICTIONARY[memory.primaryEmotion]?.label || memory.primaryEmotion}
+          </span>
+          {memory.subEmotions.map((subEmotion, index) => (
+            <span
+              key={index}
+              className="px-2 py-1 text-xs bg-neutral-100 text-neutral-600 rounded-full border border-neutral-200"
+            >
+              {subEmotion}
+            </span>
+          ))}
+        </div>
+      </div>
 
       {/* Footer */}
       <div className="flex items-center justify-between text-sm text-neutral-500">

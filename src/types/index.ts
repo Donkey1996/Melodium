@@ -5,9 +5,8 @@ export interface Memory {
   musicUrl: string;
   musicTitle?: string;
   musicArtist?: string;
-  mediaType: 'text' | 'image' | 'video' | 'audio';
-  mediaContent?: string;
-  mediaFile?: File;
+  primaryEmotion: string;
+  subEmotions: string[];
   createdAt: Date;
   tags: string[];
 }
@@ -25,7 +24,7 @@ export interface MemoryFormData {
   musicUrl: string;
   musicTitle: string;
   musicArtist: string;
-  mediaType: 'text' | 'image' | 'video' | 'audio';
-  mediaContent: string;
+  primaryEmotion: string;
+  subEmotions: string[];
   tags: string[];
 }
