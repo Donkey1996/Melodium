@@ -138,6 +138,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Built with modern web technologies for the best user experience
 - Designed with accessibility and usability in mind
 
+## New to vibe-coding
+All suggestions are welcomed!
+
 ---
 
 **Melodium** - Your emotional YouTube memory tracker ♪
