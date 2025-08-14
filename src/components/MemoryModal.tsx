@@ -57,24 +57,10 @@ const MemoryModal = ({ memory, isOpen, onClose }: MemoryModalProps) => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-start justify-between p-6 border-b border-neutral-200">
-              <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-2">
-                  <Heart className="w-5 h-5" />
-                  <span className="text-sm font-medium text-neutral-600">
-                    {EMOTION_DICTIONARY[memory.emotion]?.label || memory.emotion}
-                  </span>
-                </div>
-                <h2 className="text-2xl font-bold text-neutral-900">
-                  {memory.songTitle || 'Unknown Song'}
-                </h2>
-                <p className="text-neutral-600">
-                  {memory.artistName || 'Unknown Artist'}
-                </p>
-              </div>
+            <div className="flex items-center justify-end p-4">
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-neutral-100 rounded-lg transition-colors duration-200 ml-4"
+                className="p-2 hover:bg-neutral-100 rounded-lg transition-colors duration-200"
               >
                 <X className="w-5 h-5 text-neutral-500" />
               </button>
