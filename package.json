@@ -1,7 +1,7 @@
 {
   "name": "melodium",
   "version": "1.0.0",
-  "description": "A minimal app to attach cherished memories to your favorite music",
+  "description": "A minimalist emotion-based memory tracker for YouTube music",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,6 @@
     "@vercel/analytics": "^1.5.0",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.263.1",
-    "node-fetch": "^3.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -35,9 +34,11 @@
   "keywords": [
     "music",
     "memories",
-    "multimedia",
+    "emotions",
+    "youtube",
+    "tracker",
     "webapp"
   ],
-  "author": "Your Name",
+  "author": "",
   "license": "MIT"
 }

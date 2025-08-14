@@ -70,23 +70,3 @@ export const updateMemory = (id: string, updates: Partial<Memory>): Memory | nul
 const generateId = (): string => {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
 };
-
-export const extractYouTubeVideoId = (url: string): string | null => {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-    /youtube\.com\/watch\?.*v=([^&\n?#]+)/
-  ];
-  
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match) {
-      return match[1];
-    }
-  }
-  
-  return null;
-};
-
-export const isYouTubeUrl = (url: string): boolean => {
-  return extractYouTubeVideoId(url) !== null;
-};
