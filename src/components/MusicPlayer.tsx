@@ -4,12 +4,10 @@ import { motion } from 'framer-motion';
 
 interface MusicPlayerProps {
   musicUrl: string;
-  title?: string;
-  artist?: string;
   onClose: () => void;
 }
 
-const MusicPlayer = ({ musicUrl, title, artist, onClose }: MusicPlayerProps) => {
+const MusicPlayer = ({ musicUrl, onClose }: MusicPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.7);
@@ -72,11 +70,8 @@ const MusicPlayer = ({ musicUrl, title, artist, onClose }: MusicPlayerProps) => 
           {/* Track Info */}
           <div className="flex-1 min-w-0">
             <h4 className="font-medium text-neutral-900 truncate">
-              {title || 'Unknown Track'}
+              Now Playing
             </h4>
-            <p className="text-sm text-neutral-600 truncate">
-              {artist || 'Unknown Artist'}
-            </p>
           </div>
 
           {/* Volume Control */}

@@ -1,14 +1,10 @@
 export interface Memory {
   id: string;
-  title: string;
-  description: string;
-  musicUrl: string;
-  musicTitle?: string;
-  musicArtist?: string;
-  primaryEmotion: string;
-  subEmotions: string[];
+  youtubeUrl: string;
+  songTitle?: string;
+  artistName?: string;
+  emotion: string;
   createdAt: Date;
-  tags: string[];
 }
 
 export interface MusicInfo {
@@ -19,12 +15,6 @@ export interface MusicInfo {
 }
 
 export interface MemoryFormData {
-  title: string;
-  description: string;
-  musicUrl: string;
-  musicTitle: string;
-  musicArtist: string;
-  primaryEmotion: string;
-  subEmotions: string[];
-  tags: string[];
+  youtubeUrl: string;
+  emotion: string;
 }

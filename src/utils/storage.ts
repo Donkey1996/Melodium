@@ -1,4 +1,5 @@
-import { Memory } from '../types';
+import { Memory, MemoryFormData } from '../types';
+import { getYouTubeMetadata } from './youtube';
 
 const STORAGE_KEY = 'melodium_memories';
 
@@ -27,10 +28,16 @@ export const loadMemories = (): Memory[] => {
   return [];
 };
 
-export const addMemory = (memory: Omit<Memory, 'id' | 'createdAt'>): Memory => {
+export const addMemory = async (formData: MemoryFormData): Promise<Memory> => {
+  // Get YouTube metadata
+  const metadata = await getYouTubeMetadata(formData.youtubeUrl);
+  
   const newMemory: Memory = {
-    ...memory,
     id: generateId(),
+    youtubeUrl: formData.youtubeUrl,
+    songTitle: metadata?.title,
+    artistName: metadata?.author,
+    emotion: formData.emotion,
     createdAt: new Date()
   };
   

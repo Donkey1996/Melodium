@@ -1,29 +1,16 @@
-import { X, Play, Calendar, Tag, Heart, ExternalLink } from 'lucide-react';
+import { X, Play, Calendar, Heart, ExternalLink } from 'lucide-react';
 import { Memory } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EMOTION_DICTIONARY } from '../utils/emotions';
+import { openYouTubeVideo } from '../utils/youtube';
 
 interface MemoryModalProps {
   memory: Memory;
   isOpen: boolean;
   onClose: () => void;
-  onPlay: (musicUrl: string) => void;
 }
 
-const MemoryModal = ({ memory, isOpen, onClose, onPlay }: MemoryModalProps) => {
-  const getEmotionColor = (emotion: string) => {
-    const colors: Record<string, string> = {
-      joyful: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-      sad: 'bg-blue-100 text-blue-700 border-blue-200',
-      nostalgic: 'bg-purple-100 text-purple-700 border-purple-200',
-      peaceful: 'bg-green-100 text-green-700 border-green-200',
-      energetic: 'bg-orange-100 text-orange-700 border-orange-200',
-      romantic: 'bg-pink-100 text-pink-700 border-pink-200',
-      reflective: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-      excited: 'bg-red-100 text-red-700 border-red-200'
-    };
-    return colors[emotion] || 'bg-neutral-100 text-neutral-700 border-neutral-200';
-  };
+const MemoryModal = ({ memory, isOpen, onClose }: MemoryModalProps) => {
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
@@ -36,35 +23,16 @@ const MemoryModal = ({ memory, isOpen, onClose, onPlay }: MemoryModalProps) => {
     }).format(date);
   };
 
-  const renderEmotions = () => {
+  const renderEmotion = () => {
+    const emotion = EMOTION_DICTIONARY[memory.emotion];
     return (
       <div className="bg-neutral-50 rounded-xl p-6">
         <h4 className="font-medium text-neutral-900 mb-4 flex items-center space-x-2">
           <Heart className="w-5 h-5" />
-          <span>Emotions</span>
+          <span>Feeling</span>
         </h4>
-        <div className="space-y-3">
-          <div>
-            <p className="text-sm text-neutral-600 mb-2">Primary emotion:</p>
-            <span className={`inline-block px-4 py-2 text-sm font-medium rounded-full border ${getEmotionColor(memory.primaryEmotion)}`}>
-              {EMOTION_DICTIONARY[memory.primaryEmotion]?.label || memory.primaryEmotion}
-            </span>
-          </div>
-          {memory.subEmotions.length > 0 && (
-            <div>
-              <p className="text-sm text-neutral-600 mb-2">Related emotions:</p>
-              <div className="flex flex-wrap gap-2">
-                {memory.subEmotions.map((subEmotion, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 text-xs bg-neutral-100 text-neutral-600 rounded-full border border-neutral-200"
-                  >
-                    {subEmotion}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+        <div className={`inline-block px-6 py-3 text-lg font-medium rounded-full ${emotion?.accent || 'bg-neutral-500 text-white'}`}>
+          {emotion?.label || memory.emotion}
         </div>
       </div>
     );
@@ -94,14 +62,14 @@ const MemoryModal = ({ memory, isOpen, onClose, onPlay }: MemoryModalProps) => {
                 <div className="flex items-center space-x-3 mb-2">
                   <Heart className="w-5 h-5" />
                   <span className="text-sm font-medium text-neutral-600">
-                    {EMOTION_DICTIONARY[memory.primaryEmotion]?.label || memory.primaryEmotion}
+                    {EMOTION_DICTIONARY[memory.emotion]?.label || memory.emotion}
                   </span>
                 </div>
-                <h2 className="text-2xl font-bold text-neutral-900 mb-2">
-                  {memory.title}
+                <h2 className="text-2xl font-bold text-neutral-900">
+                  {memory.songTitle || 'Unknown Song'}
                 </h2>
-                <p className="text-neutral-600 leading-relaxed">
-                  {memory.description}
+                <p className="text-neutral-600">
+                  {memory.artistName || 'Unknown Artist'}
                 </p>
               </div>
               <button
@@ -116,27 +84,30 @@ const MemoryModal = ({ memory, isOpen, onClose, onPlay }: MemoryModalProps) => {
             <div className="p-6 space-y-6">
               {/* Music Section */}
               <div className="bg-gradient-to-r from-primary-50 to-primary-100 rounded-xl p-6">
-                <h3 className="font-semibold text-primary-900 mb-4">🎵 Music</h3>
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <h4 className="font-medium text-primary-900">
-                      {memory.musicTitle || 'Unknown Track'}
-                    </h4>
-                    <p className="text-primary-700">
-                      {memory.musicArtist || 'Unknown Artist'}
-                    </p>
+                    {memory.songTitle && memory.artistName ? (
+                      <div>
+                        <h4 className="text-lg font-medium text-primary-900">{memory.songTitle}</h4>
+                        <p className="text-primary-700">{memory.artistName}</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <h4 className="text-lg font-medium text-primary-900">YouTube Video</h4>
+                      </div>
+                    )}
                     <a 
-                      href={memory.musicUrl} 
+                      href={memory.youtubeUrl} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-sm text-primary-600 hover:text-primary-800 flex items-center space-x-1 mt-2"
                     >
-                      <span>Open in music app</span>
+                      <span>Open on YouTube</span>
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
                   <button
-                    onClick={() => onPlay(memory.musicUrl)}
+                    onClick={() => openYouTubeVideo(memory.youtubeUrl)}
                     className="p-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-colors duration-200"
                   >
                     <Play className="w-5 h-5" />
@@ -144,28 +115,8 @@ const MemoryModal = ({ memory, isOpen, onClose, onPlay }: MemoryModalProps) => {
                 </div>
               </div>
 
-              {/* Emotions */}
-              {renderEmotions()}
-
-              {/* Tags */}
-              {memory.tags.length > 0 && (
-                <div className="bg-neutral-50 rounded-xl p-6">
-                  <h4 className="font-medium text-neutral-900 mb-3 flex items-center space-x-2">
-                    <Tag className="w-4 h-4" />
-                    <span>Tags</span>
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {memory.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-primary-100 text-primary-700 text-sm rounded-full"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {/* Emotion */}
+              {renderEmotion()}
 
               {/* Footer */}
               <div className="flex items-center space-x-2 text-sm text-neutral-500 pt-4 border-t border-neutral-200">

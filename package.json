@@ -13,6 +13,7 @@
     "@vercel/analytics": "^1.5.0",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.263.1",
+    "node-fetch": "^3.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

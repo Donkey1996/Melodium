@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Analytics } from '@vercel/analytics/react';
+import Header from './components/Header';
+import MemoryCard from './components/MemoryCard';
+import CreateMemoryForm from './components/CreateMemoryForm';
+import EmptyState from './components/EmptyState';
+import MemoryModal from './components/MemoryModal';
 import { Memory, MemoryFormData } from './types';
 import { loadMemories, addMemory } from './utils/storage';
-import EmptyState from './components/EmptyState';
-import CreateMemoryForm from './components/CreateMemoryForm';
-import MemoryCard from './components/MemoryCard';
-import MemoryModal from './components/MemoryModal';
 
 function App() {
   const [memories, setMemories] = useState<Memory[]>([]);
@@ -14,14 +15,9 @@ function App() {
   const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
 
   useEffect(() => {
-    try {
-      const savedMemories = loadMemories();
-      console.log('Loaded memories:', savedMemories);
-      setMemories(savedMemories);
-    } catch (error) {
-      console.error('Error loading memories:', error);
-      setMemories([]);
-    }
+    // Load memories from localStorage on app start
+    const savedMemories = loadMemories();
+    setMemories(savedMemories);
   }, []);
 
   const handleCreateMemory = async (formData: MemoryFormData) => {
@@ -31,8 +27,10 @@ function App() {
       setShowCreateForm(false);
     } catch (error) {
       console.error('Error creating memory:', error);
+      // You could add toast notification here
     }
   };
+
 
   const handleMemoryClick = (memory: Memory) => {
     setSelectedMemory(memory);
@@ -42,24 +40,21 @@ function App() {
     setSelectedMemory(null);
   };
 
+  // const handleDeleteMemory = (id: string) => {
+  //   setMemories(prev => prev.filter(memory => memory.id !== id));
+  //   // Note: In a real app, you'd also call deleteMemory from storage utils
+  // };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
-      <header className="bg-white/80 backdrop-blur-md border-b border-neutral-200">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-center">
-            <h1 className="text-2xl font-bold text-neutral-900">
-              🎵 Melodium
-            </h1>
-          </div>
-        </div>
-      </header>
+      <Header />
       
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Create Memory Button */}
         <div className="mb-8 flex justify-center">
           <button
             onClick={() => setShowCreateForm(true)}
-            className="inline-flex items-center space-x-2 text-lg px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            className="btn-primary inline-flex items-center space-x-2 text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
           >
             <span className="text-2xl">+</span>
             <span>Create New Memory</span>
@@ -104,6 +99,7 @@ function App() {
           />
         )}
       </AnimatePresence>
+
 
       {/* Vercel Analytics */}
       <Analytics />
